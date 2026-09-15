@@ -7,7 +7,7 @@
   'use strict';
 
   // --- Build stamp (rewritten at push time) ---
-  var EE_SHIP_VERSION = '2026-09-15 44c7bf0';
+  var EE_SHIP_VERSION = '2026-09-15 dad27b8';
 
   // Extra persist keys (lab already uses ee-muted, ee-best-run)
   var KEY_FACTION = 'ee-last-faction';
@@ -357,7 +357,19 @@
   function registerSw() {
     if (!('serviceWorker' in navigator)) return;
     // Prefer relative so project Pages (/elemental-evolves/) works
-    navigator.serviceWorker.register('./sw.js').catch(function (err) {
+    navigator.serviceWorker.register('./sw.js').then(function (reg) {
+      // Pull a fresh SW when a new deploy lands (cache name bump + skipWaiting)
+      try {
+        reg.update();
+      } catch (e) {}
+      // One soft reload when the new worker takes control (drops stale shell)
+      var refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }).catch(function (err) {
       console.warn('[ee-ship] SW register failed', err);
     });
   }

@@ -1,12 +1,12 @@
-/* Elemental Evolves service worker — cache-first shell, network for the rest */
-var CACHE = 'ee-shell-v1';
+/* Elemental Evolves service worker
+ * - Hashed assets / images: cache-first
+ * - HTML / ship shell / navigations: network-first (so Pages deploys win over stale shells)
+ * Bump CACHE whenever the shell or asset filenames change.
+ */
+var CACHE = 'ee-shell-v2';
 var PRECACHE = [
-  './',
-  './index.html',
   './manifest.webmanifest',
-  './ship.js',
   './ship.css',
-  './sw.js',
   './assets/styles-Cx26EWNc.css',
   './assets/index-BZl0-dnr.js',
   './assets/routes-D8ZwckNV.js',
@@ -43,34 +43,62 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+function isShellDoc(url) {
+  var p = url.pathname;
+  // Project Pages live under /elemental-evolves/
+  if (p.endsWith('/') || p.endsWith('/index.html') || /\/index\.html$/.test(p)) return true;
+  if (p.endsWith('/ship.js') || p.endsWith('/sw.js') || p.endsWith('/ship.css')) return true;
+  return false;
+}
+
 self.addEventListener('fetch', function (event) {
   var req = event.request;
   if (req.method !== 'GET') return;
 
   var url = new URL(req.url);
-  // Same-origin only
   if (url.origin !== self.location.origin) return;
 
-  // Cache-first for precached shell / hashed assets / icons / keyart
+  // Navigations + HTML/ship shell: network-first, cache fallback for offline
+  if (req.mode === 'navigate' || isShellDoc(url)) {
+    event.respondWith(
+      fetch(req)
+        .then(function (res) {
+          if (res && res.ok) {
+            var copy = res.clone();
+            caches.open(CACHE).then(function (cache) {
+              try {
+                cache.put(req, copy);
+              } catch (e) {}
+            });
+          }
+          return res;
+        })
+        .catch(function () {
+          return caches.open(CACHE).then(function (cache) {
+            return cache.match(req).then(function (hit) {
+              if (hit) return hit;
+              if (req.mode === 'navigate') return cache.match('./index.html');
+              return undefined;
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  // Hashed assets / icons / art: cache-first
   event.respondWith(
     caches.open(CACHE).then(function (cache) {
       return cache.match(req).then(function (hit) {
         if (hit) return hit;
-        return fetch(req)
-          .then(function (res) {
-            // Opportunistically cache successful GETs under our origin for assets
-            if (res && res.ok && (url.pathname.indexOf('/assets/') !== -1 || url.pathname.match(/\.(js|css|png|jpg|webmanifest)$/))) {
-              try {
-                cache.put(req, res.clone());
-              } catch (e) {}
-            }
-            return res;
-          })
-          .catch(function () {
-            // Offline navigation fallback
-            if (req.mode === 'navigate') return cache.match('./index.html');
-            return cache.match(req);
-          });
+        return fetch(req).then(function (res) {
+          if (res && res.ok && (url.pathname.indexOf('/assets/') !== -1 || url.pathname.match(/\.(js|css|png|jpg|webmanifest)$/))) {
+            try {
+              cache.put(req, res.clone());
+            } catch (e) {}
+          }
+          return res;
+        });
       });
     })
   );
