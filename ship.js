@@ -7,7 +7,7 @@
   'use strict';
 
   // --- Build stamp (rewritten at push time) ---
-  var EE_SHIP_VERSION = '2026-09-15 7fca092';
+  var EE_SHIP_VERSION = '2026-09-15 13c8587';
 
   // Extra persist keys (lab already uses ee-muted, ee-best-run)
   var KEY_FACTION = 'ee-last-faction';
