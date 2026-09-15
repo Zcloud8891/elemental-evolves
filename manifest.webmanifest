@@ -1,0 +1,25 @@
+{
+  "name": "Elemental Evolves",
+  "short_name": "Evolves",
+  "description": "Classic Evolves × Reborn — five colors around the Void Nexus.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05060c",
+  "theme_color": "#05060c",
+  "icons": [
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

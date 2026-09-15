@@ -1,0 +1,94 @@
+/* Ship-layer: safe-area + install chip + version stamp (non-game chrome) */
+:root {
+  --ee-safe-top: env(safe-area-inset-top, 0px);
+  --ee-safe-right: env(safe-area-inset-right, 0px);
+  --ee-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ee-safe-left: env(safe-area-inset-left, 0px);
+}
+
+#ee-install-chip {
+  position: fixed;
+  z-index: 9998;
+  right: max(12px, var(--ee-safe-right));
+  bottom: max(12px, calc(12px + var(--ee-safe-bottom)));
+  max-width: min(280px, calc(100vw - 24px - var(--ee-safe-left) - var(--ee-safe-right)));
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #f2f4ff;
+  background: rgba(7, 9, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  padding: 10px 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#ee-install-chip[hidden] {
+  display: none !important;
+}
+
+#ee-install-chip .ee-chip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+#ee-install-chip .ee-chip-title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+#ee-install-chip .ee-chip-body {
+  color: rgba(255, 255, 255, 0.78);
+  margin-top: 4px;
+}
+
+#ee-install-chip .ee-chip-steps {
+  margin: 6px 0 0;
+  padding-left: 1.1em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+#ee-install-chip .ee-chip-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+#ee-install-chip button {
+  appearance: none;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#ee-install-chip button.ee-primary {
+  background: linear-gradient(180deg, #3d5cff, #2a3fd0);
+  border-color: rgba(120, 150, 255, 0.55);
+}
+
+#ee-install-chip button:active {
+  transform: scale(0.98);
+}
+
+#ee-version-stamp {
+  position: fixed;
+  z-index: 9997;
+  left: max(8px, var(--ee-safe-left));
+  bottom: max(6px, calc(6px + var(--ee-safe-bottom)));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  user-select: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
